@@ -6,6 +6,9 @@ export DEBIAN_FRONTEND=noninteractive
 # enable SSH
 touch /boot/ssh
 
+# Disable Bluetooth
+echo "dtoverlay=disable-bt" >> /boot/config.txt
+
 # Create new user (replace 'newuser' and 'your-password-hash' with your desired username and password hash)
 # Generate a hash for a password using the following command "openssl passwd -6 your-password-here"
 # Use "\" to escape the "$" in the password hash
