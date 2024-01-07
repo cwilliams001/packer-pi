@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+from time import sleep 
+import serial 
+import sys
+
+try:
+ serw = serial.Serial("/dev/ttyUSB2", baudrate = 115200, timeout = 1, rtscts=True, dsrdtr=True)
+ serw.write("AT+QGPS=1\r".encode("utf-8")) 
+ serw.close()
+ print("Successfully sent AT Command")
+ sys.exit(0)
+except Exception as e:
+ print("Failed to send AT command")
+ print(e)
+ sys.exit(1)
