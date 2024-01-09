@@ -5,7 +5,7 @@ source "arm" "raspbian" {
   file_target_extension = "xz"
   file_unarchive_cmd    = ["xz", "-d", "$ARCHIVE_PATH"]
   image_build_method    = "reuse"
-  image_path            = "raspian.img"
+  image_path            = "raspbian.img"
   image_size            = "16G"
   image_type            = "dos"
 
@@ -34,6 +34,12 @@ source "arm" "raspbian" {
 
 }
 
+
+locals {
+  formatted_timestamp = formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())
+}
+
+# Cell Hat APN name
 variable "apn_name" {
   type = string
 }
@@ -41,10 +47,29 @@ variable "apn_name" {
 build {
   sources = ["source.arm.raspbian"]
 
+  provisioner "shell" {
+    inline = [
+      "mkdir -p /opt/source/logs"
+    ]
+  }
+
   # Shell provisioner to run the main provision script
   provisioner "shell" {
     script = "./setup-scripts/provision-pi.sh"
 
+  }
+  # File provisioner to download the log file created by provision-pi.sh during the build process
+  provisioner "file" {
+    source = "/opt/source/logs/provision-pi.log"
+    destination = "provision-pi.log-${local.formatted_timestamp}"
+    direction = "download"
+  }
+
+  # Remove the log file from the Raspberry Pi
+  provisioner "shell" {
+    inline = [
+      "rm /opt/source/logs/provision-pi.log"
+    ]
   }
 
   # Shell provisioner to create a directory and write the APN name into a file
@@ -127,14 +152,28 @@ build {
   }
 
   provisioner "file" {
-  source      = "./setup-scripts/ufw-setup.sh"
-  destination = "/opt/source/ufw-setup.sh"
+    source      = "./setup-scripts/ufw-setup.sh"
+    destination = "/opt/source/ufw-setup.sh"
   }
 
   provisioner "shell" {
-  inline = [
-    "chmod +x /opt/source/ufw-setup.sh"
-  ]
+    inline = [
+      "chmod +x /opt/source/ufw-setup.sh"
+    ]
   }
+
+  # Shell provisioner to run the post-provision script
+  post-processor "shell-local" {
+    inline = [
+      "mkdir -p /build/logs",
+      "sha256sum /build/raspbian.img >> /build/logs/temp-image-sha256.sum",
+      "mv /build/provision-pi.log-* /build/logs/",
+      "LATEST_LOG=$(ls -Art /build/packer-build-*.log | tail -n 1)",
+      "sh /build/post-provision-scripts/append_log.sh \"$LATEST_LOG\"",
+      "mv /build/packer-build-*.log /build/logs/"
+    ]
+  }
+
+
 
 }

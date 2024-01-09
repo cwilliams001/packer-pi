@@ -1,2 +1,5 @@
 .packer_cache
+logs
+packer-build*
 peer1.conf
+raspbian.img
