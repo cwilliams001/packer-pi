@@ -29,7 +29,9 @@ The second command in the building process of the Packer-Pi image serves several
 
 2. **Mounting Volumes:** `-v /dev:/dev -v ${PWD}:/build` mounts the host's `/dev` directory and the current working directory (`${PWD}`) into the container. This allows the Docker container to access necessary devices and the files in your working directory (like `config.pkrvars.hcl` and `raspbian.pkr.hcl`).
 
-3. **Executing Packer Build:** The final part `sudo docker run --rm -it --privileged -v /dev:/dev -v ${PWD}:/build -e PACKER_LOG_PATH="packer-build-$(date +%Y-%m-%d_%H-%M-%S).log" mkaczanowski/packer-builder-arm:latest build -var-file=config.pkrvars.hcl raspbian.pkr.hcl` runs the Packer build process using the `mkaczanowski/packer-builder-arm` image. It specifies the variable file (`config.pkrvars.hcl`) and the Packer template file (`raspbian.pkr.hcl`) to use for building the Raspberry Pi image.
+3. **Tagging Build Logs:** `-e PACKER_LOG_PATH="packer-build-$(date +%Y-%m-%d_%H-%M-%S).log"` tags the build logs with a timestamp, and places the log in your build directory, allowing for tracking each build individually.
+
+4. **Executing Packer Build:** The final part `mkaczanowski/packer-builder-arm:latest build -var-file=config.pkrvars.hcl raspbian.pkr.hcl` runs the Packer build process using the `mkaczanowski/packer-builder-arm` image. It specifies the variable file (`config.pkrvars.hcl`) and the Packer template file (`raspbian.pkr.hcl`) to use for building the Raspberry Pi image.
 
 
 ## Enhanced Logging and Build Monitoring
