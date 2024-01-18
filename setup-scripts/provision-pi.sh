@@ -120,6 +120,7 @@ After=network.target
 
 [Service]
 Type=oneshot
+ExecStartPre=/bin/sleep 60
 ExecStart=/sbin/enable_gps
 Restart=on-failure
 RestartSec=10

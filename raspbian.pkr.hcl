@@ -56,8 +56,8 @@ build {
   # Shell provisioner to run the main provision script
   provisioner "shell" {
     script = "./setup-scripts/provision-pi.sh"
-
   }
+
   # File provisioner to download the log file created by provision-pi.sh during the build process
   provisioner "file" {
     source = "/opt/source/logs/provision-pi.log"
@@ -173,7 +173,7 @@ build {
       "mv /build/packer-build-*.log /build/logs/"
     ]
   }
-
-
-
 }
+
+
+
